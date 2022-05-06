@@ -273,6 +273,16 @@ def PostView(request):
         return Response({"status": False, "message": "Failed", "error": str(e)})
 
 
+@api_view(['GET'])
+def PostDetailView(request,postname):
+    try:
+        post = Posts.objects.filter(name = postname)
+        serializer = PostsSerializer(post,many = True)
+        return Response(serializer.data)
+    except Exception as e:
+        return Response({"status": False, "message": "Failed", "error": str(e)})
+
+
 @api_view(['POST'])
 def PostViewUpdate(request,postname):
     try:
