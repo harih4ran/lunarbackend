@@ -60,7 +60,7 @@ class HeroSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
 
 
-class  PostsSerializer(serializers.HyperlinkedModelSerializer):
+class  PostsSerializer(serializers.ModelSerializer):
     datehumanize = serializers.SerializerMethodField('dateHumanize')
 
     def dateHumanize(self,obj):
