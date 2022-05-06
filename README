@@ -1,0 +1,53 @@
+localhost instructions
+
+assuming your in >>> backend   directory
+
+activate virtual environment
+
+----command--
+.\env\Scripts\activate
+
+-----
+
+runserver server
+----command---
+
+python manage.py runserver
+
+------
+
+On your browser : open localhost url
+
+---
+127:0:0:8000/admin
+
+----
+
+login on django 
+username:  lunaradmin
+password:  moon124admin
+
+
+-----
+
+----open---
+
+studentss
+
+{it contains studentss model data}
+
+ ----path for display of students model data ---
+
+ 127:0:0:8000/admin/path/students/
+
+ ------
+ note:
+
+ lunar folder ----- is the lunar app intergeated folder
+
+ model.py --- contains database fields
+ views.py--- takes web request and response
+ urls.py --- contains application paths
+ serializers.py ---converts complex data in to native oython datatypes(json,xml) and other types
+
+ 

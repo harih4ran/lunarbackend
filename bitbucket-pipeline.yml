@@ -1,0 +1,25 @@
+image: python:3.7.2
+
+pipelines:
+default:
+- step: 
+name: Build
+script:
+- git archive --format=tar.gz master -o sample-app.tar.gz
+artifacts:
+- sample-app.tar.gz
+- step:
+
+  name: Deploy to production
+  deployment: production
+  caches:
+    - pip 
+      script:
+-pipe: atlassian/heroku-deploy:0.1.1
+variables:
+    HEROLU_API_KEY:
+    $HEROKU_API_KEY
+    HEROKU_APP_NAME:
+    $HEROKU_APP_NAME
+
+ZIP_FILE: sample-app.tar.gz

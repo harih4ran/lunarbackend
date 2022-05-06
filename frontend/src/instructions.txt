@@ -1,0 +1,11 @@
+How to open the React app
+
+1. Make sure you have react router dom version 5 installed
+
+npm i react-router-dom@5.0.0
+
+2. Then on your CLI 
+  - cd frontend
+  -npm start
+
+And your React App will open
