@@ -1,5 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import User
+import datetime
+from .usermanager import MyUserManager
+from django.utils import timezone
+from django.contrib.auth.models import (BaseUserManager, AbstractBaseUser)
 
 #Student model
 class Students(models.Model):
@@ -75,14 +78,27 @@ class Student(models.Model):
 
 #Teacher model
 class Teacher(models.Model):
-    Teacher_id =models.IntegerField()
+    Teacher_id = models.IntegerField(null = True)
     Teacher_name = models.CharField(max_length=200,null=True,blank=True)
     Teacher_subject = models.CharField(max_length=200, null=True, blank = True)
     Teacher_total =  models.IntegerField(null=True,blank=True,default=0)
     _id = models.AutoField(primary_key=True,editable=False)
+    password = models.CharField(max_length=200,null=True,blank=True)
+    profile =  models.ImageField(null=True, blank=True)
+    title =  models.CharField(max_length=200, null=True, blank = True)
+    lastname = models.CharField(max_length=200, null=True, blank = True)
+    middlename = models.CharField(max_length=200, null=True, blank = True)
+    surname = models.CharField(max_length=200, null=True, blank = True)
+    email = models.EmailField(unique = True,null=True, blank = True)
+    phone = models.IntegerField(null = True)
+    college = models.CharField(max_length=200, null=True, blank = True)
+    dept =  models.CharField(max_length=200, null=True, blank = True)
+    course =  models.CharField(max_length=200, null=True, blank = True)
+    officenumber = models.CharField(max_length=200, null=True, blank = True)
+    building = models.CharField(max_length=200, null=True, blank = True)
 
     def __str__(self):
-        return self.Teacher_name
+        return str(self.Teacher_id)
 
  #Subject model
 class Subject(models.Model):
@@ -114,7 +130,9 @@ class Attendance(models.Model):
     _id = models.AutoField(primary_key=True,editable=False)
 
     def __str__(self):
-        return self.Attendance_date
+        return str(self.Subject_id)
+
+
 
 #Attendance Report model
 class AttendanceReport(models.Model):
@@ -124,18 +142,19 @@ class AttendanceReport(models.Model):
     status = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.Attendance_id
+        return str(self.Attendance_id)
 
 #Appointment model
 class Appointment(models.Model):
     id = models.AutoField(primary_key=True)
     student_id = models.ForeignKey(Student, on_delete=models.DO_NOTHING)
-    appointment_date = models.CharField(max_length=255)
+    appointment_date = models.DateField(null = True)
+    appointment_time = models.TimeField(null = True)
     appointment_message = models.ForeignKey(Attendance, on_delete=models.CASCADE)
     status = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.appointment_message
+        return str(self.appointment_message)
 
 
 
@@ -162,23 +181,6 @@ class Documents(models.Model):
 
     def __str__(self):
         return str(self.name)
-'''
-  #  @property
-    def doxlist(self):
-        return self.dox_List.all()
-
-class DocumentList(models.Model):
-    name = models.CharField(max_length=200, null=True, blank=True)
-    type = models.CharField(max_length=200, null=True, blank=True)
-    attachment = models.FileField(null=True, blank=True)
-    _id = models.AutoField(primary_key=True, editable=False)
-    documents = models.ManyToManyField(Documents, related_name= "documents")
-
-    def __str__(self):
-        return str(self.name)
-
-'''
-
 
 
 class Assignments(models.Model):
@@ -195,3 +197,30 @@ class Assignments(models.Model):
 
 
 
+class User(AbstractBaseUser):
+    role_options = (
+        ("student", "student"),
+        ("teacher", "teacher"),
+        ("admin", "admin"),
+    )
+    login_id = models.CharField(max_length=10, unique=True)
+    password = models.CharField(max_length=255)
+    hint = models.CharField(max_length=255)
+    role = models.CharField(max_length=20, choices=role_options)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
+    date_joined = models.DateTimeField(default=timezone.now)
+
+    objects = MyUserManager()
+
+    USERNAME_FIELD = 'login_id'
+
+    def __str__(self):
+        return f"{self.login_id}"
+
+    def has_perm(self, perm, obj=None):
+        return True
+
+    def has_module_perms(self, app_label):
+        return True

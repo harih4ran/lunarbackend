@@ -19,7 +19,7 @@ router.register(r'sessions',views.SessionViewSet)
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('user/', UserRecordView.as_view(), name='users'),
     path('session/<course>/',views.sessiondetails),
     path('assignment/<course>/',views.assignmentdetails),
@@ -33,5 +33,10 @@ urlpatterns = [
     path('assignmentview/',views.AssignmentView),
     path('sessionview/',views.SessionView),
     path('sessionview/<int:id>/',views.SessionViewDelete),
+
+    path('getuser/', views.LoadUserView.as_view()),
+    path('tutor/', views.TutorView.as_view()),
+    path('tutorupdate/', views.TutorUpdate),
+    path('appointment/<status>/', views.getAppointment),
 
 ]

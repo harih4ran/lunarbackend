@@ -77,29 +77,6 @@ class DocumentViewSet(viewsets.ModelViewSet):
     queryset  = Documents.objects.all()
     serializer_class= DocumentsSerializer
 
-'''
-class DocumentListViewSet(viewsets.ModelViewSet):  
-    queryset  = DocumentList.objects.all()
-    serializer_class= DocumentListSerializer
-
-
-
-
-@api_view(['GET','POST'])
-def getAssignments(request):
-    assignments = Assignments.objects.all()
-    serializer = AssignmentsSerializer(assignments, many =True)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-def getPosts(request):
-    posts = Posts.objects.all()
-    serializer = PostsSerializer(posts, many =True)
-    return Response(serializer.data)
-'''
-# Create your views here.
-
 
 @api_view(['POST'])
 def registerUser(request):
@@ -190,10 +167,17 @@ def getAttendanceReport(request):
     return Response(serializer.data)
 
 @api_view(['GET'])
-def getAppointment(request):
-    appointment = Appointment.objects.all()
-    serializer = AppointmentSerializer(appointment, many =True)
-    return Response(serializer.data)
+def getAppointment(request,status):
+    if status == "yes":
+        appointment = Appointment.objects.filter(status = True)
+        serializer = AppointmentSerializer(appointment, many =True)
+        return Response(serializer.data)
+    elif status == "no":
+        appointment = Appointment.objects.filter(status = False)
+        serializer = AppointmentSerializer(appointment, many =True)
+        return Response(serializer.data)
+    else:
+        return Response("Some thing wrong")
 
 
 @api_view(['GET'])
@@ -262,7 +246,6 @@ def PostView(request):
             description = data['description'],
             photo = photo
         )
-
         return Response(
             {
                 "success": True,
@@ -271,7 +254,6 @@ def PostView(request):
         )
     except Exception as e:
         return Response({"status": False, "message": "Failed", "error": str(e)})
-
 
 @api_view(['GET'])
 def PostDetailView(request,postname):
@@ -287,8 +269,7 @@ def PostDetailView(request,postname):
 def PostViewUpdate(request,postname):
     try:
         data=json.loads(request.POST['data'])
-        photo = request.FILES.get('photo')
-        Posts.objects.filter(name = postname).update(name = data['name'],description = data['description'],photo = photo)
+        Posts.objects.filter(name = postname).update(name = data['name'],description = data['description'],photo = request.FILES.get('photo'))
 
         return Response(
             {
@@ -371,3 +352,137 @@ def SessionViewDelete(request,id):
         )
     except Exception as e:
         return Response({"status": False, "message": "Failed", "error": str(e)})
+
+
+class LoadUserView(APIView):
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, format=None):
+        try:
+            auth = request.user
+            user = UserSerializer(auth)
+            if auth.role == "student":
+                # staff = Stu.objects.get(staff_id=auth.login_id)
+                # serializer = StaffSerializer(staff)
+                return Response(
+                    {
+                        "status": True,
+                        "message": "Success",
+                        # "data": serializer.data,
+                        "user": user.data,
+                        "isAuthenticated":True,
+                    }
+                )
+            elif auth.role == "teacher":
+                teacher = Teacher.objects.get(Teacher_id =auth.login_id)
+                serializer = TeacherSerializer(teacher)
+                return Response(
+                    {
+                        "status": True,
+                        "message": "Success",
+                        "data": serializer.data,
+                        "user": user.data,
+                        "isAuthenticated":True,
+                    }
+                )
+            elif auth.role == "admin":
+                admin = User.objects.get(login_id=auth.login_id)
+                serializer = UserSerializer(admin)
+                return Response(
+                    {
+                        "status": True,
+                        "message": "Success",
+                        "user": serializer.data,
+                        "isAuthenticated":True,
+                    }
+                )
+            else:
+                return Response({"status": False, "message": "Failed"})
+        except:
+            return Response({'error': 'Something went wrong when trying to load user'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class TutorView(APIView):
+    def post(self, request, format=None):
+        data = request.data
+        id_number = data['Id_Number']
+        title = data['title']
+        lastname = data['LastName']
+        middlename = data['MiddleName']
+        surname = data['Surname']
+        email = data['Email']
+        phone = data['Phone_Number']
+        college = data['College']
+        dept = data['Department']
+        course = data['Course']
+        officenumber = data['Office_Number'],
+        password = data['password']
+        building = data['Building']
+
+        if User.objects.filter(login_id = id_number).exists():
+            return Response("Please enter different Teacher ID")
+        else:
+            Teacher.objects.create(
+                Teacher_id = id_number,
+                profile = request.FILES.get('profile_photo'),
+                # officenumber = officenumber,
+                course = course,
+                dept = dept,
+                college = college,
+                phone = phone,
+                email = email,
+                surname = surname,
+                middlename = middlename,
+                lastname = lastname,
+                title = title,
+                password = password,
+                building = building
+            )
+
+            User.objects.create_user(
+                login_id = id_number,
+                password = password,
+                role = 'teacher'
+            )
+            return Response({"status": True, "message": "Teacher created Successfully"})
+        return Response({"status": False, "message": "Failed"})
+    
+@api_view(['POST'])
+def TutorUpdate(request):
+    data = request.data
+    id_number = data['Id_Number']
+    title = data['title']
+    lastname = data['LastName']
+    middlename = data['MiddleName']
+    surname = data['Surname']
+    email = data['Email']
+    phone = data['Phone_Number']
+    college = data['College']
+    dept = data['Department']
+    course = data['Course']
+    officenumber = data['Office_Number'],
+    print(officenumber)
+    building = data['Building']
+
+    try:
+        teacher = Teacher.objects.get(Teacher_id = id_number)
+        teacher.course = course
+        teacher.dept = dept
+        teacher.college = college
+        teacher.phone = phone
+        teacher.email = email
+        teacher.surname = surname
+        teacher.middlename = middlename
+        teacher.lastname = lastname
+        teacher.title = title
+        teacher.building = building
+        teacher.officenumber = officenumber
+        teacher.save()
+        if request.FILES.get('profile_photo') == None:
+            pass
+        else:
+            Teacher.objects.filter(Teacher_id= id_number).update(profile = request.FILES.get('profile_photo'))
+                    
+        return Response({"status": True, "message": "Teacher updated Successfully"})
+    except:     
+        return Response({"status": False, "message": "Failed"})
+

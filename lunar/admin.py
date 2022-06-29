@@ -18,4 +18,5 @@ admin.site.register(Documents)
 admin.site.register(Assignments)
 admin.site.register(Posts)
 admin.site.register(Hero)
+admin.site.register(User)
 
