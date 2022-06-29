@@ -476,12 +476,12 @@ def TutorUpdate(request):
         teacher.title = title
         teacher.building = building
         teacher.officenumber = officenumber
-        teacher.save()
         if request.FILES.get('profile_photo') == None:
-            pass
+            teacher.save()
         else:
-            Teacher.objects.filter(Teacher_id= id_number).update(profile = request.FILES.get('profile_photo'))
-                    
+            teacher.profile = request.FILES.get("profile_photo") 
+            teacher.save()   
+                
         return Response({"status": True, "message": "Teacher updated Successfully"})
     except:     
         return Response({"status": False, "message": "Failed"})
