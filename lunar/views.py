@@ -269,8 +269,11 @@ def PostDetailView(request,postname):
 def PostViewUpdate(request,postname):
     try:
         data=json.loads(request.POST['data'])
-        Posts.objects.filter(name = postname).update(name = data['name'],description = data['description'],photo = request.FILES.get('photo'))
-
+        post = Posts.objects.get(name = postname)
+        post.name = data['name']
+        post.description = data['description']
+        post.photo = request.FILES.get('photo')
+        post.save()
         return Response(
             {
                 "success": True,
@@ -280,7 +283,7 @@ def PostViewUpdate(request,postname):
     except Exception as e:
         return Response({"status": False, "message": "Failed", "error": str(e)})
 
-@api_view(['POST'])
+@api_view(['DELETE'])
 def PostViewDelete(request,postname):
     try:
         Posts.objects.filter(name = postname).delete()
@@ -424,7 +427,7 @@ class TutorView(APIView):
             Teacher.objects.create(
                 Teacher_id = id_number,
                 profile = request.FILES.get('profile_photo'),
-                # officenumber = officenumber,
+                officenumber = officenumber,
                 course = course,
                 dept = dept,
                 college = college,
@@ -459,8 +462,7 @@ def TutorUpdate(request):
     college = data['College']
     dept = data['Department']
     course = data['Course']
-    officenumber = data['Office_Number'],
-    print(officenumber)
+    officenumber = request.data['Office_Number']
     building = data['Building']
 
     try:
@@ -474,8 +476,9 @@ def TutorUpdate(request):
         teacher.middlename = middlename
         teacher.lastname = lastname
         teacher.title = title
-        teacher.building = building
         teacher.officenumber = officenumber
+        teacher.building = building
+        
         if request.FILES.get('profile_photo') == None:
             teacher.save()
         else:

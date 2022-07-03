@@ -94,7 +94,7 @@ class Teacher(models.Model):
     college = models.CharField(max_length=200, null=True, blank = True)
     dept =  models.CharField(max_length=200, null=True, blank = True)
     course =  models.CharField(max_length=200, null=True, blank = True)
-    officenumber = models.CharField(max_length=200, null=True, blank = True)
+    officenumber = models.TextField(blank = True,null=True)
     building = models.CharField(max_length=200, null=True, blank = True)
 
     def __str__(self):
