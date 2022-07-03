@@ -417,36 +417,44 @@ class TutorView(APIView):
         college = data['College']
         dept = data['Department']
         course = data['Course']
-        officenumber = data['Office_Number'],
+        officenumber = request.data['Office_Number']
         password = data['password']
         building = data['Building']
 
         if User.objects.filter(login_id = id_number).exists():
-            return Response("Please enter different Teacher ID")
+            return Response({"status": False, "message": "Please enter different Teacher ID"})
+        elif Teacher.objects.filter(email = email).exists():
+            return Response({"status": False, "message": "Please enter different Email ID"})
+        elif Teacher.objects.filter(Teacher_id = id_number).exists():
+            return Response({"status": False, "message": "Please enter different Teacher ID"})
         else:
-            Teacher.objects.create(
-                Teacher_id = id_number,
-                profile = request.FILES.get('profile_photo'),
-                officenumber = officenumber,
-                course = course,
-                dept = dept,
-                college = college,
-                phone = phone,
-                email = email,
-                surname = surname,
-                middlename = middlename,
-                lastname = lastname,
-                title = title,
-                password = password,
-                building = building
-            )
+            try:
+                Teacher.objects.create(
+                    Teacher_id = id_number,
+                    profile = request.FILES.get('profile_photo'),
+                    officenumber = officenumber,
+                    course = course,
+                    dept = dept,
+                    college = college,
+                    phone = phone,
+                    email = email,
+                    surname = surname,
+                    middlename = middlename,
+                    lastname = lastname,
+                    title = title,
+                    password = password,
+                    building = building
+                )
 
-            User.objects.create_user(
-                login_id = id_number,
-                password = password,
-                role = 'teacher'
-            )
-            return Response({"status": True, "message": "Teacher created Successfully"})
+                user = User.objects.create_user(
+                    login_id = id_number,
+                    password = password
+                )
+                user.role = 'teacher'
+                user.save()
+                return Response({"status": True, "message": "Teacher created Successfully"})
+            except Exception as e:
+                return Response({"data":str(e),"status": False, "message": "Failed"})
         return Response({"status": False, "message": "Failed"})
     
 @api_view(['POST'])
