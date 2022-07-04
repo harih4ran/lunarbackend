@@ -121,7 +121,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_ROOT =  os.path.join(BASE_DIR, 'media') 
 MEDIA_URL = '/media/'
 CORS_ALLOW_ALL_ORIGINS=True
-CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = ["https://dashboard.kampusplusdev.xyz"]
 AUTH_USER_MODEL = 'lunar.User'
 
 
@@ -131,11 +131,7 @@ REST_FRAMEWORK = {
     ]
 }
 
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-CORS_ALLOW_ALL_ORIGINS=True
-CORS_ALLOW_CREDENTIALS = True
-
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
