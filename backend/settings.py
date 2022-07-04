@@ -121,7 +121,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_ROOT =  os.path.join(BASE_DIR, 'media') 
 MEDIA_URL = '/media/'
 CORS_ALLOW_ALL_ORIGINS=True
-CSRF_TRUSTED_ORIGINS = ["https://dashboard.kampusplusdev.xyz"]
+CORS_ALLOW_CREDENTIALS = True
 AUTH_USER_MODEL = 'lunar.User'
 
 
